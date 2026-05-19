@@ -1,0 +1,563 @@
+import React, { useState, useMemo } from 'react';
+import { Building2, HardHat, Clock, TrendingUp, Zap, FileText, Users, Calendar, AlertTriangle, CheckCircle2, ArrowRight, Target, Layers, MessageSquare, FileSearch, ClipboardCheck, DollarSign } from 'lucide-react';
+
+const LOGO_BLUE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGYAAABUCAYAAABwbULEAAAEKUlEQVR4nO1cW5IbMQgcp3KOvdLePtdxvlw1JQuBUDcgW/23taNpBYaHWmQfP7//roN6+JO9gYM+jmOK4jimKP5mb+CGp/L7x2Y8S6jgGM1Q7XNew0XxQJDpmJGh7kZpn5s1nMQz4vDwQJHlmJ4hJANIBnwO1kg8sxxWHjiii//z6hvL+g9vnxtFndUpPY4ejzUVQhAVMTMRouEhvE9b4+G5rvco9b5vCuyIWY0QCdb60D7r5QqPIKZjkFHSg+VdbD6acxipjO0QibOXetAIS29Ix2Q4JAt0B6FS2Tc55Q5aekNFTEUnRO2JwvPJImbouQMNT8RYpZRvBMw2M46xfIHI88MuoIijFsesiIAZed6jDHhAFWE1x6yKgEwJwxrBUdxQEXZU/LcWAUkIE2GtXZlXBGQ5SKtlWpr18KE0P9MayTFoEXD0/llY94ZyDuPwrO5NqzGo/IyQMDyp9d4IIG4+0aKo+MH0HFNNBFw1UGsANp8Hb41A1snfm96YeZ11d+TCKJWxN2SNHnQ67aGcCFthfKmCQpC1B7HOfLKIuTVGERM9tvONk5hTXVk0ziRmB9UnMRETklE8UPQc0x7KMkXAkba0+yTmUMGIjhj0YXGGa1ZoTBn0e0HqynYRAa17202EHbbLO4uA24uwFhGzqghowbYirOWAORvOUZqTdmvKgCe9SfYYAnlRVkoEJGMlvcGGMSwvrJC2okEVYVfb5coOiZ7QgbbXXhFzh+GKCvtz22k2YqwjQ9dVJ3LYoNhkdRJTk0ymNrMZZu3x+hlW/D3DbdEOaostM42F2EOrMd72F31a7mEmhaD4vM2OdP4RwZjE1DZToSjPQnKIxybae6/r4k5i3teiHaTpTUidD31oNq2NmMS8vwfhIOveVpzDVjHUvWkRwyjY3vrTGmu21lk/gqhD8/Cd0ZOYL4y6lZn11mcjeFbw1kZnjy8hCihjTbr4mjmJ2eOyDE5U5oAhO2IsQH+96dFwg/sGMwoZKnWJoQsJMwdMFjyaE5IvQqWQIPJUG/hjiqKjmbRy0ZPhGIQIOGOsHUTYN/RSGXMDKyJg+x7mYTFahH3js/w/f4SjEMXd0u5a1q/whUUPexKTLQJqY0O9NR6+aBGWNomZLQJuL8J6rpZnx5i0Nbuhd0Pqsc20iNlbXFEEvBvoXgsZ0dLjbrl6P2vrRbAuyirJHkzQRFjvJGblQb8MwG3jPWDu4ISsPUJ4d1CXvxIoSaZiakMdji08LZZ50X/eN11jCgT1Y0SLmN4eH8EbhZDswKgxUgsZNYmJkpOsnJSPgin7f1J6C6+hEV3ZmcR0ILJdRqW3iElMaU1YpEffYK6kN8+Qe6uneXisXFBk3fmfSUwF2Sf/M4kpoMpcmXZtjDCSpeaU6RarOOaFKMOUcYCE7FR2IOA4piiOY4riP2VpU3He0ohfAAAAAElFTkSuQmCC";
+
+const LOGO_WHITE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGYAAABUCAYAAABwbULEAAAEIUlEQVR4nO1d0XLtIAhMOvf/f/n0KTO5VhRwFzAn+9ZpEARFXJn2/Hw+x4t6+Mk24EUfb2CK4g1MUfzLNuCG2WF3bqZnCRUCo60+ru+8jovSA0FmYEaOujul/c7qOEnPSIdHDxRnUrncU6pxQCs3k7F+35PRykERHRjEpLXO9gRlJO8Zw42oVIac5CmMN5Px6DkaXWHpjb1jmKvuPnY75uh3CH3osf+AeY9hT0QzFlsfbVUzUllGbv4c/dSDRlh6QwamRDUTBHqAUKnsm4JyBy29oXZMxSBE2UTR82QSc+uHJs+O0VIp3wiYbyyB0axAxv2hOijkqCYwKyRgRp73MAMeUEnY2c2/MgkYffOXxrfoUftzdPh7ScCz8+2nM96O6M2jN18JowX0H7RVmZcEZAVotiNmadajbyUgrdwUUmCQqQB9CdPahgoOIzVPbZPOGBa9vTJJb2pFyVlktRD93AtMRMlrmTTjcY2tTwvR11k3f296Y+Z15DmyjNE9hm2QlqFF2TEapxwJW6F9qQJDkGWDeBl+Mom5NUY7JpJSufSN8MROTNGWCqns7cTsoHonJqJDMkoPFLML5nFsSgI6v+/JaOWsGPo4esesTtpC6a+QsK18+O6RqrJdSECtbbuRsMNyeWcScHsSdpbK7qkDcehGH6Ro1mAlvZlSq7Z3eScS8BEkLPKhrBQJSMZKeoM1Y2gGrJC2okElYVfL5coBie7QgZbXXhJzh+aKCva5/WTdMZamvyo7hw2KT1Y7MUftOE8PkNUf188qf2jKZc85Es03SQ6pwvOZZWZnjLf8Rd+We7CkEJQ+74KT6B0RjE7MmTEVDmUrpIB4fDIb9zgObifmXRYdoKhOTMaleemMYdIaq+ePxTbvPCKb/bpjz3YM4/D0nj/t6rWeddpdGlW4mEnMCBKwp8sCRCcmQ48V5ToxLyAOUIZMOvma2YnZ06VpnKisA4bsHaMBevWm74Yb3C+YUchgqUs0XUiwXDBZ8HBOSH0RLIWEkp2Y0aRoO1bvMavM7skIjCVtSQ5jXRbLBKiXypgGrJCA7TjMy2I0CftH32zHWFenxgjRmAk05a5GfkVf2O4ZvccgGABWtaWxDc1gIOcytc3ylzF2IgG3J2E9T8vWNqaZzG44j/6T8fU7CWGdmBpkkICPIGFZD2WVaA8maCSstxOzcqNfBuC+8V4wdwhClo0QvTuwy18JFCVTMbWhLscaPS2W9aL/vG86xxQI6mJEk5jeGh+hNwoh2YFxxkglZFQnJqqnTKuTsiiYtP+T0lv4GRr5H5dCSUDlNxY9q2OZEFkuo9Kb1uGrKS210tzpn8d5m9ytciVK/6zAXPj2TkwR2Tf/txNTQJW+stmzMcJJmjOnTLVYJTAXohxTJgASslPZCwFvYIriDUxR/AIG+2PXtfV4YgAAAABJRU5ErkJggg==";
+
+export default function AutomationBrief() {
+  const [vertical, setVertical] = useState('realestate');
+  const [currency, setCurrency] = useState('AED');
+
+  const rates = { USD: 1, GBP: 0.79, EUR: 0.92, AED: 3.67 };
+  const symbols = { USD: '$', GBP: '£', EUR: '€', AED: 'AED ' };
+
+  const fmt = (usd) => {
+    const v = usd * rates[currency];
+    if (v >= 1000) return `${symbols[currency]}${Math.round(v / 1000)}k`;
+    return `${symbols[currency]}${Math.round(v)}`;
+  };
+
+  const fmtFull = (usd) => {
+    const v = usd * rates[currency];
+    return `${symbols[currency]}${Math.round(v).toLocaleString()}`;
+  };
+
+  // Real Estate Brokerage opportunities
+  const realEstateOpps = [
+    {
+      icon: MessageSquare,
+      title: 'Never Lose a Lead to Slow Response',
+      priority: 'HIGH',
+      bullets: [
+        { lead: 'The problem.', body: 'Most leads go to whoever replies first. But your agents take over 15 hours to get back. So 2 out of 3 leads you pay for close with someone else.' },
+        { lead: 'What we build.', body: 'A 24/7 assistant that replies within seconds across WhatsApp, Instagram, Bayut and Property Finder. It qualifies the buyer and books the viewing into your agent\u2019s calendar.' },
+        { lead: 'What changes for you.', body: 'Your agents stop chasing cold leads. They walk into viewings already booked, with the buyer already qualified.' },
+      ],
+      metrics: [
+        { label: 'How fast leads get a reply', before: '15 hrs', after: 'Under 30 sec', source: 'Inman 2025' },
+        { label: 'Leads that turn into clients', before: '2\u20135%', after: '5\u201310%', source: 'Bayut Academy' },
+        { label: 'Hours freed per agent each week', before: '-', after: '10\u201315', source: '' },
+      ],
+      mathBasis: '40 leads/month \u00d7 AED 30k commission \u00d7 conversion lift from 2% to 5% (Bayut\u2019s reported range).',
+      savingsLow: 180000,
+      savingsHigh: 380000,
+      payback: '2\u20133 weeks'
+    },
+    {
+      icon: FileText,
+      title: 'Give Agents Their Selling Hours Back',
+      priority: 'HIGH',
+      bullets: [
+        { lead: 'The problem.', body: 'Every deal eats around 40 hours of paperwork, signatures, bank follow-ups and deadlines. Across a year, that\u2019s a second full-time job per agent, none of it selling.' },
+        { lead: 'What we build.', body: 'A system that runs the admin side of every deal. It reads the contract on arrival, tracks each deadline, chases documents, and keeps your CRM up to date.' },
+        { lead: 'What changes for you.', body: 'Your agents get back at least half their admin hours and start closing 30\u201350% more deals a year, because they finally have time to sell.' },
+      ],
+      metrics: [
+        { label: 'Admin hours per deal', before: '40 hrs', after: '12\u201315 hrs', source: 'NAR 2025' },
+        { label: 'Deals each agent can close a year', before: '10\u201312', after: '15\u201320', source: 'NAR 2025' },
+        { label: 'Deadlines missed or slipping through', before: 'often', after: 'almost never', source: '' },
+      ],
+      mathBasis: '10 agents \u00d7 12 deals/year \u00d7 25 hrs saved/deal \u00d7 AED 220 hourly cost.',
+      savingsLow: 180000,
+      savingsHigh: 320000,
+      payback: '4\u20136 weeks'
+    }
+  ];
+
+  // Construction / Developer opportunities
+  const constructionOpps = [
+    {
+      icon: Building2,
+      title: 'Turn Enquiries Into Showroom Visits, 24/7',
+      priority: 'HIGH',
+      bullets: [
+        { lead: 'The problem.', body: 'Most enquiries come in after hours across WhatsApp, Instagram, Bayut, Property Finder and Dubizzle. Your team misses 60% of the first-reply window, and your showroom fills with people who were never going to buy.' },
+        { lead: 'What we build.', body: 'A concierge that picks up every enquiry within a minute, in Arabic or English. It qualifies on budget, unit type, payment plan and nationality, sends the brochure, and books the showroom visit.' },
+        { lead: 'What changes for you.', body: 'Your sales team only spends time on serious buyers. Your marketing spend goes further because fewer leads slip through.' },
+      ],
+      metrics: [
+        { label: 'Time to first reply', before: '4\u201312 hrs', after: 'Under 60 sec', source: 'Bayut Academy' },
+        { label: 'Showroom visits that are actually qualified', before: '~25%', after: '55\u201370%', source: '' },
+        { label: 'Cost per good lead', before: 'AED 290\u2013550', after: 'AED 90\u2013165', source: 'Property Finder 2025' },
+      ],
+      mathBasis: '800 enquiries/month \u00d7 AED 1.5M unit price \u00d7 small lift in qualified visits closing.',
+      savingsLow: 320000,
+      savingsHigh: 650000,
+      payback: '4\u20136 weeks'
+    },
+    {
+      icon: FileSearch,
+      title: 'Keep Projects Moving When Questions Hit Site',
+      priority: 'HIGH',
+      bullets: [
+        { lead: 'The problem.', body: 'Every site question turns into an RFI. Each burns 8 hours of your team\u2019s time and takes nearly 10 days to resolve. About 1 in 7 are already answered in the drawings.' },
+        { lead: 'What we build.', body: 'A system that checks every question against the drawings and specs first. If the answer is already there, it\u2019s closed in seconds. If not, it routes to the right person, starts the clock, and chases overdue items automatically.' },
+        { lead: 'What changes for you.', body: 'RFI resolution times drop by half. Your project team gets hundreds of hours back. Site delays from slow answers stop happening.' },
+      ],
+      metrics: [
+        { label: 'Hours spent on each RFI', before: '8 hrs', after: '2\u20133 hrs', source: 'Navigant CCF' },
+        { label: 'Days to get an answer', before: '9.7 days', after: '4\u20135 days', source: 'Navigant CCF' },
+        { label: 'Questions that didn\u2019t need to be asked', before: '13%', after: 'Under 3%', source: 'Navigant CCF' },
+      ],
+      mathBasis: '~200 RFIs/year \u00d7 5 hrs saved each \u00d7 AED 310 hourly project-team cost.',
+      savingsLow: 95000,
+      savingsHigh: 180000,
+      payback: '2\u20133 months'
+    }
+  ];
+
+  const current = vertical === 'realestate' ? realEstateOpps : constructionOpps;
+
+  const totals = useMemo(() => {
+    const low = current.reduce((s, o) => s + o.savingsLow, 0);
+    const high = current.reduce((s, o) => s + o.savingsHigh, 0);
+    return { low, high };
+  }, [current]);
+
+  return (
+    <div style={{ fontFamily: "'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", background: 'linear-gradient(180deg, #f8fbff 0%, #eef4fc 100%)', minHeight: '100vh', padding: '0', color: '#0a1e3f' }}>
+
+      {/* Header */}
+      <div style={{ background: 'linear-gradient(135deg, #0a1e3f 0%, #1e4fd6 50%, #2563eb 100%)', padding: '48px 40px 80px', color: 'white', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: -80, right: -80, width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)' }} />
+        <div style={{ position: 'absolute', bottom: -120, left: -120, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)' }} />
+
+        <div style={{ maxWidth: 1200, margin: '0 auto', position: 'relative' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 32, fontSize: 13, letterSpacing: 2, opacity: 0.9, textTransform: 'uppercase' }}>
+            <img src={LOGO_WHITE} alt="Mindlink Systems" style={{ height: 40, width: 'auto' }} />
+            <span>Mindlink Systems · For UAE Real Estate &amp; Property</span>
+          </div>
+          <h1 style={{ fontSize: 52, fontWeight: 700, lineHeight: 1.05, margin: '0 0 16px', letterSpacing: -1.2 }}>
+            Where Your Business Is Leaking Money
+          </h1>
+          <p style={{ fontSize: 19, opacity: 0.88, maxWidth: 780, lineHeight: 1.55, margin: '0 0 20px', fontWeight: 300 }}>
+            Two of the biggest reasons UAE brokerages and developers lose deals, and how we fix them.
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8, fontSize: 13, opacity: 0.75, flexWrap: 'wrap' }}>
+            <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#fcd34d' }} />
+            <span>Built by Ramzi Dalloul, formerly in real estate management and operations at DALFA. LSE Real Estate Finance.</span>
+          </div>
+          <div style={{ fontSize: 12.5, opacity: 0.6, marginBottom: 32, fontStyle: 'italic' }}>
+            Currently engaged with operators in spray foam insulation and real estate private equity.
+          </div>
+
+          {/* Vertical Switcher */}
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <button onClick={() => setVertical('realestate')} style={{ padding: '14px 24px', borderRadius: 12, border: 'none', cursor: 'pointer', background: vertical === 'realestate' ? 'white' : 'rgba(255,255,255,0.12)', color: vertical === 'realestate' ? '#0a1e3f' : 'white', fontWeight: 600, fontSize: 15, display: 'flex', alignItems: 'center', gap: 10, fontFamily: 'inherit', backdropFilter: 'blur(10px)', transition: 'all 0.2s' }}>
+              <Building2 size={18} /> Real Estate Brokerages
+            </button>
+            <button onClick={() => setVertical('construction')} style={{ padding: '14px 24px', borderRadius: 12, border: 'none', cursor: 'pointer', background: vertical === 'construction' ? 'white' : 'rgba(255,255,255,0.12)', color: vertical === 'construction' ? '#0a1e3f' : 'white', fontWeight: 600, fontSize: 15, display: 'flex', alignItems: 'center', gap: 10, fontFamily: 'inherit', backdropFilter: 'blur(10px)', transition: 'all 0.2s' }}>
+              <HardHat size={18} /> Developers & Construction
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Summary Bar */}
+      <div style={{ maxWidth: 1200, margin: '-48px auto 0', padding: '0 40px', position: 'relative', zIndex: 2 }}>
+        <div style={{ background: 'white', borderRadius: 20, padding: 32, boxShadow: '0 20px 60px -20px rgba(10,30,63,0.25)', border: '1px solid rgba(30,79,214,0.08)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
+            <div>
+              <div style={{ fontSize: 12, letterSpacing: 1.5, color: '#1e4fd6', fontWeight: 600, textTransform: 'uppercase', marginBottom: 6 }}>
+                {vertical === 'realestate' ? 'A founder-led brokerage doing $5–15M a year' : 'A founder-led developer or contractor'}
+              </div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: '#0a1e3f' }}>What you could earn back in a year</div>
+            </div>
+            <div style={{ display: 'flex', gap: 6, background: '#f1f5fb', padding: 4, borderRadius: 10 }}>
+              {Object.keys(rates).map(c => (
+                <button key={c} onClick={() => setCurrency(c)} style={{ padding: '8px 14px', border: 'none', background: currency === c ? '#1e4fd6' : 'transparent', color: currency === c ? 'white' : '#64748b', borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  {c}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
+            <div style={{ padding: 20, borderRadius: 14, background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)', border: '1px solid #bfdbfe' }}>
+              <div style={{ fontSize: 12, color: '#1e4fd6', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>At the low end</div>
+              <div style={{ fontSize: 32, fontWeight: 700, color: '#0a1e3f' }}>{fmt(totals.low)}</div>
+            </div>
+            <div style={{ padding: 20, borderRadius: 14, background: 'linear-gradient(135deg, #0a1e3f 0%, #1e4fd6 100%)', color: 'white' }}>
+              <div style={{ fontSize: 12, opacity: 0.8, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>At the high end</div>
+              <div style={{ fontSize: 32, fontWeight: 700 }}>{fmt(totals.high)}</div>
+            </div>
+            <div style={{ padding: 20, borderRadius: 14, background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)', border: '1px solid #fcd34d' }}>
+              <div style={{ fontSize: 12, color: '#92400e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>Pays for itself in</div>
+              <div style={{ fontSize: 32, fontWeight: 700, color: '#78350f' }}>6–10 wks</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* What our vetted developers have built */}
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '60px 40px 0' }}>
+        <div style={{ marginBottom: 28 }}>
+          <div style={{ fontSize: 12, letterSpacing: 2, color: '#1e4fd6', fontWeight: 600, textTransform: 'uppercase', marginBottom: 6 }}>Proof</div>
+          <h2 style={{ fontSize: 32, fontWeight: 700, margin: '0 0 8px', letterSpacing: -0.5, color: '#0a1e3f' }}>What our vetted developers have built</h2>
+          <p style={{ fontSize: 14.5, color: '#64748b', margin: 0, maxWidth: 720, lineHeight: 1.55 }}>
+            We work with a vetted network of developers who have delivered these systems in production.
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+          {/* GenZone — lead case study */}
+          <div style={{ background: 'white', borderRadius: 16, padding: 28, border: '1px solid #e2e8f0', boxShadow: '0 2px 12px -4px rgba(10,30,63,0.06)' }}>
+            <div style={{ fontSize: 11, letterSpacing: 1.5, color: '#1e4fd6', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Case Study</div>
+            <h3 style={{ fontSize: 19, fontWeight: 700, margin: '0 0 4px', color: '#0a1e3f' }}>GenZone</h3>
+            <div style={{ fontSize: 13, color: '#64748b', marginBottom: 18 }}>Dubai relocation services</div>
+
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>The challenge</div>
+              <p style={{ fontSize: 13.5, color: '#334155', lineHeight: 1.55, margin: 0 }}>A manual sales process, slow lead qualification, and a fragmented client journey that was capping growth.</p>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>What was built</div>
+              <p style={{ fontSize: 13.5, color: '#334155', lineHeight: 1.55, margin: 0 }}>A custom automated CRM, an AI voice agent for client communication, automated qualification questionnaires, and 14 workflow automations across the sales funnel.</p>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 16, paddingTop: 16, borderTop: '1px solid #e2e8f0' }}>
+              <div style={{ padding: 12, borderRadius: 10, background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)', border: '1px solid #bfdbfe' }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#0a1e3f', lineHeight: 1 }}>20 hrs</div>
+                <div style={{ fontSize: 11, color: '#1e4fd6', marginTop: 4 }}>saved every week</div>
+              </div>
+              <div style={{ padding: 12, borderRadius: 10, background: 'linear-gradient(135deg, #0a1e3f 0%, #1e4fd6 100%)', color: 'white' }}>
+                <div style={{ fontSize: 20, fontWeight: 700, lineHeight: 1 }}>AED 10.3k</div>
+                <div style={{ fontSize: 11, opacity: 0.85, marginTop: 4 }}>weekly cost savings</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Club Five Health — supporting case study */}
+          <div style={{ background: 'white', borderRadius: 16, padding: 28, border: '1px solid #e2e8f0', boxShadow: '0 2px 12px -4px rgba(10,30,63,0.06)' }}>
+            <div style={{ fontSize: 11, letterSpacing: 1.5, color: '#1e4fd6', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Case Study</div>
+            <h3 style={{ fontSize: 19, fontWeight: 700, margin: '0 0 4px', color: '#0a1e3f' }}>Club Five Health</h3>
+            <div style={{ fontSize: 13, color: '#64748b', marginBottom: 18 }}>Health &amp; wellness franchise</div>
+
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>The challenge</div>
+              <p style={{ fontSize: 13.5, color: '#334155', lineHeight: 1.55, margin: 0 }}>Scaling from 2 to 50 locations with limited staff bandwidth and inconsistent onboarding across sites.</p>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>What was built</div>
+              <p style={{ fontSize: 13.5, color: '#334155', lineHeight: 1.55, margin: 0 }}>A custom CRM with full client journey tracking, an AI appointment setter, an AI-powered training system, and high-volume email infrastructure.</p>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 16, paddingTop: 16, borderTop: '1px solid #e2e8f0' }}>
+              <div style={{ padding: 12, borderRadius: 10, background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)', border: '1px solid #bfdbfe' }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#0a1e3f', lineHeight: 1 }}>67 hrs</div>
+                <div style={{ fontSize: 11, color: '#1e4fd6', marginTop: 4 }}>saved every week</div>
+              </div>
+              <div style={{ padding: 12, borderRadius: 10, background: 'linear-gradient(135deg, #0a1e3f 0%, #1e4fd6 100%)', color: 'white' }}>
+                <div style={{ fontSize: 20, fontWeight: 700, lineHeight: 1 }}>2 → 50</div>
+                <div style={{ fontSize: 11, opacity: 0.85, marginTop: 4 }}>locations in 18 months</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Rambo OS — interactive proof */}
+        <a href="https://livedemo.rambo.so/" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', display: 'block' }}>
+          <div style={{ background: 'linear-gradient(135deg, #0a1e3f 0%, #1e4fd6 100%)', borderRadius: 16, padding: 28, color: 'white', position: 'relative', overflow: 'hidden', cursor: 'pointer' }}>
+            <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)' }} />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: 280 }}>
+                <div style={{ fontSize: 11, letterSpacing: 1.5, color: '#fcd34d', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Live Demo</div>
+                <h3 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 8px' }}>Rambo OS — see it running</h3>
+                <p style={{ fontSize: 14.5, opacity: 0.88, lineHeight: 1.55, margin: 0, maxWidth: 640 }}>
+                  An all-in-one operations dashboard built by our network. Specialised AI agents handle CEO, CFO, marketing and operations roles, giving a single founder the equivalent of a full executive team.
+                </p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', background: 'white', color: '#0a1e3f', borderRadius: 10, fontSize: 14, fontWeight: 700, flexShrink: 0 }}>
+                Open the live demo
+                <ArrowRight size={16} color="#0a1e3f" />
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      {/* Opportunities */}
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '60px 40px 40px' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <div style={{ fontSize: 12, letterSpacing: 2, color: '#1e4fd6', fontWeight: 600, textTransform: 'uppercase', marginBottom: 6 }}>What we fix</div>
+            <h2 style={{ fontSize: 36, fontWeight: 700, margin: 0, letterSpacing: -0.5 }}>
+              {vertical === 'realestate' ? 'For real estate brokerages in the UAE' : 'For developers and contractors in the UAE'}
+            </h2>
+          </div>
+          <div style={{ fontSize: 14, color: '#64748b', maxWidth: 320 }}>
+            The two biggest leaks in your business, and how we plug them.
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gap: 24 }}>
+          {current.map((opp, i) => {
+            const Icon = opp.icon;
+            const priorityColor = opp.priority === 'HIGH' ? '#059669' : '#d97706';
+            const priorityBg = opp.priority === 'HIGH' ? '#d1fae5' : '#fef3c7';
+
+            return (
+              <div key={i} style={{ background: 'white', borderRadius: 20, padding: 36, boxShadow: '0 4px 24px -8px rgba(10,30,63,0.08)', border: '1px solid #e2e8f0', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, width: 4, height: '100%', background: 'linear-gradient(180deg, #1e4fd6 0%, #2563eb 100%)' }} />
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: 40 }}>
+                  {/* Left: content */}
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20, flexWrap: 'wrap' }}>
+                      <div style={{ width: 56, height: 56, borderRadius: 14, background: 'linear-gradient(135deg, #0a1e3f 0%, #1e4fd6 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', flexShrink: 0 }}>
+                        <Icon size={26} />
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: 11, letterSpacing: 1.5, color: '#64748b', fontWeight: 600 }}>FIX {String(i + 1).padStart(2, '0')}</span>
+                          <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 6, background: priorityBg, color: priorityColor, letterSpacing: 1 }}>{opp.priority} PRIORITY</span>
+                        </div>
+                        <h3 style={{ fontSize: 22, fontWeight: 700, margin: 0, color: '#0a1e3f', lineHeight: 1.25 }}>{opp.title}</h3>
+                      </div>
+                    </div>
+
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+                      {opp.bullets.map((b, j) => (
+                        <li key={j} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                          <div style={{ flexShrink: 0, marginTop: 7, width: 6, height: 6, borderRadius: '50%', background: '#1e4fd6' }} />
+                          <p style={{ fontSize: 14.5, lineHeight: 1.6, color: '#334155', margin: 0 }}>
+                            <strong style={{ color: '#0a1e3f', fontWeight: 700 }}>{b.lead}</strong> {b.body}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Right: metrics + ROI */}
+                  <div>
+                    <div style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%)', borderRadius: 14, padding: 22, marginBottom: 16, border: '1px solid #e2e8f0' }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, color: '#0a1e3f', textTransform: 'uppercase', marginBottom: 14 }}>The difference it makes</div>
+                      {opp.metrics.map((m, j) => (
+                        <div key={j} style={{ marginBottom: j < opp.metrics.length - 1 ? 14 : 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
+                            <div style={{ fontSize: 12, color: '#64748b' }}>{m.label}</div>
+                            {m.source && (
+                              <div style={{ fontSize: 9.5, fontWeight: 600, letterSpacing: 0.5, color: '#94a3b8', padding: '2px 6px', background: 'white', borderRadius: 4, border: '1px solid #e2e8f0', flexShrink: 0 }}>{m.source}</div>
+                            )}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 600 }}>
+                            <span style={{ color: '#94a3b8', textDecoration: 'line-through' }}>{m.before}</span>
+                            <ArrowRight size={12} color="#1e4fd6" />
+                            <span style={{ color: '#0a1e3f' }}>{m.after}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div style={{ background: 'linear-gradient(135deg, #0a1e3f 0%, #1e4fd6 100%)', borderRadius: 14, padding: 22, color: 'white' }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, opacity: 0.75, textTransform: 'uppercase', marginBottom: 12 }}>What you get back</div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                        <span style={{ fontSize: 12, opacity: 0.8 }}>A year from now</span>
+                        <span style={{ fontSize: 16, fontWeight: 700 }}>{fmt(opp.savingsLow)} – {fmt(opp.savingsHigh)}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.15)', marginBottom: 12 }}>
+                        <span style={{ fontSize: 12, opacity: 0.8 }}>Pays for itself in</span>
+                        <span style={{ fontSize: 16, fontWeight: 700, color: '#fcd34d' }}>{opp.payback}</span>
+                      </div>
+                      <div style={{ paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.15)', fontSize: 11.5, lineHeight: 1.5, opacity: 0.7, fontStyle: 'italic' }}>
+                        How we got there: {opp.mathBasis}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* How we work */}
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 40px 40px' }}>
+        <div style={{ background: 'linear-gradient(135deg, #0a1e3f 0%, #1e4fd6 100%)', borderRadius: 20, padding: 44, color: 'white', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: -80, right: -80, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)' }} />
+          <div style={{ position: 'relative' }}>
+            <div style={{ fontSize: 12, letterSpacing: 2, opacity: 0.75, fontWeight: 600, textTransform: 'uppercase', marginBottom: 6 }}>How we work</div>
+            <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 28px', letterSpacing: -0.4 }}>What it’s like to work with us</h2>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 22, maxWidth: 820 }}>
+              <div style={{ display: 'flex', gap: 18, alignItems: 'flex-start' }}>
+                <div style={{ flexShrink: 0, width: 36, height: 36, borderRadius: 10, background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: '#fcd34d' }}>1</div>
+                <div>
+                  <div style={{ fontSize: 17, fontWeight: 600, marginBottom: 4 }}>We're picky about who we work with.</div>
+                  <p style={{ fontSize: 14.5, lineHeight: 1.6, opacity: 0.85, margin: 0 }}>We only take on clients where the values line up, the communication is honest, and the relationship can run for years, not months. Most builds go live in 4 to 8 weeks, but that's the start of the relationship, not the end.</p>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: 18, alignItems: 'flex-start' }}>
+                <div style={{ flexShrink: 0, width: 36, height: 36, borderRadius: 10, background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: '#fcd34d' }}>2</div>
+                <div>
+                  <div style={{ fontSize: 17, fontWeight: 600, marginBottom: 4 }}>We work how you work.</div>
+                  <p style={{ fontSize: 14.5, lineHeight: 1.6, opacity: 0.85, margin: 0 }}>WhatsApp, in person, evenings, weekends. Whatever your business runs on, we run on. The right answer in real estate isn’t always at 9am on a Tuesday.</p>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: 18, alignItems: 'flex-start' }}>
+                <div style={{ flexShrink: 0, width: 36, height: 36, borderRadius: 10, background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: '#fcd34d' }}>3</div>
+                <div>
+                  <div style={{ fontSize: 17, fontWeight: 600, marginBottom: 4 }}>One person owns your account.</div>
+                  <p style={{ fontSize: 14.5, lineHeight: 1.6, opacity: 0.85, margin: 0 }}>You’ll never be passed between teams or chase someone for a status update. The same person who scopes your build is the one who picks up the phone six months later.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* What makes us different */}
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 40px 40px' }}>
+        <div style={{ background: 'white', borderRadius: 20, padding: 40, border: '1px solid #e2e8f0' }}>
+          <div style={{ fontSize: 12, letterSpacing: 2, color: '#1e4fd6', fontWeight: 600, textTransform: 'uppercase', marginBottom: 6 }}>Why people pick us</div>
+          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 32px', color: '#0a1e3f', letterSpacing: -0.4 }}>What makes us different</h2>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: 32, alignItems: 'center' }}>
+              <div>
+                <h3 style={{ fontSize: 19, fontWeight: 700, margin: '0 0 10px', color: '#0a1e3f' }}>We don’t sell software. We build you a system.</h3>
+                <p style={{ fontSize: 15, lineHeight: 1.65, color: '#475569', margin: 0 }}>
+                  CRMs like Ruby, Pixxi and REM ask you to fit your business around their software. We do the opposite: we look at how your business actually runs, then build the system around it.
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexShrink: 0 }}>
+                <div style={{ width: 56, height: 56, borderRadius: 12, background: '#f1f5fb', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                  <img src="https://logo.clearbit.com/rubycrm.ai" alt="Ruby" style={{ maxWidth: '70%', maxHeight: '70%', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = '<span style=\"font-size:11px;font-weight:700;color:#64748b;\">Ruby</span>'; }} />
+                </div>
+                <div style={{ width: 56, height: 56, borderRadius: 12, background: '#f1f5fb', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                  <img src="https://logo.clearbit.com/pixxicrm.com" alt="Pixxi" style={{ maxWidth: '70%', maxHeight: '70%', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = '<span style=\"font-size:11px;font-weight:700;color:#64748b;\">Pixxi</span>'; }} />
+                </div>
+                <div style={{ width: 56, height: 56, borderRadius: 12, background: '#f1f5fb', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                  <img src="https://logo.clearbit.com/rem-app.com" alt="REM" style={{ maxWidth: '70%', maxHeight: '70%', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = '<span style=\"font-size:11px;font-weight:700;color:#64748b;\">REM</span>'; }} />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ height: 1, background: '#e2e8f0' }} />
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: 32, alignItems: 'center' }}>
+              <div>
+                <h3 style={{ fontSize: 19, fontWeight: 700, margin: '0 0 10px', color: '#0a1e3f' }}>We know real estate. Not “all industries.”</h3>
+                <p style={{ fontSize: 15, lineHeight: 1.65, color: '#475569', margin: 0 }}>
+                  Most AI agencies in Dubai pitch the same playbook to a hospital, a law firm and a brokerage. Companies like Bird, Arcitech and Konvergense work across every sector at once. We picked one and went deep. We understand how Bayut leads behave differently from Instagram leads, and why a Dubai off-plan deal closes differently to a ready resale.
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexShrink: 0 }}>
+                <div style={{ width: 56, height: 56, borderRadius: 12, background: '#f1f5fb', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                  <img src="https://logo.clearbit.com/bird.ae" alt="Bird" style={{ maxWidth: '70%', maxHeight: '70%', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = '<span style=\"font-size:11px;font-weight:700;color:#64748b;\">Bird</span>'; }} />
+                </div>
+                <div style={{ width: 56, height: 56, borderRadius: 12, background: '#f1f5fb', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                  <img src="https://logo.clearbit.com/arcitech.ai" alt="Arcitech" style={{ maxWidth: '70%', maxHeight: '70%', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = '<span style=\"font-size:11px;font-weight:700;color:#64748b;\">Arcitech</span>'; }} />
+                </div>
+                <div style={{ width: 56, height: 56, borderRadius: 12, background: '#f1f5fb', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                  <img src="https://logo.clearbit.com/konvergense.com" alt="Konvergense" style={{ maxWidth: '70%', maxHeight: '70%', objectFit: 'contain' }} onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = '<span style=\"font-size:10px;font-weight:700;color:#64748b;\">Konvergense</span>'; }} />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ height: 1, background: '#e2e8f0' }} />
+
+            <div>
+              <h3 style={{ fontSize: 19, fontWeight: 700, margin: '0 0 10px', color: '#0a1e3f' }}>You get a builder, not an agency.</h3>
+              <p style={{ fontSize: 15, lineHeight: 1.65, color: '#475569', margin: 0 }}>
+                The big consultancies put juniors on your account. CRM vendors give you a support ticket. With us, the same person who scopes the work builds it, and answers your message six months later. That's it.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      {/* Methodology */}
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 40px 40px' }}>
+        <div style={{ background: 'white', borderRadius: 20, padding: 36, border: '1px solid #e2e8f0' }}>
+          <div style={{ fontSize: 12, letterSpacing: 2, color: '#1e4fd6', fontWeight: 600, textTransform: 'uppercase', marginBottom: 6 }}>Where these numbers come from</div>
+          <h2 style={{ fontSize: 26, fontWeight: 700, margin: '0 0 20px', color: '#0a1e3f' }}>We’d rather be honest than impressive</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, color: '#1e4fd6' }}>
+                <Target size={18} /><strong style={{ fontSize: 14, color: '#0a1e3f' }}>Real data, not guesses</strong>
+              </div>
+              <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.6, margin: 0 }}>
+                Every figure has its source tagged on it, with the full list at the bottom. We don't invent numbers to win a deal.
+              </p>
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, color: '#1e4fd6' }}>
+                <CheckCircle2 size={18} /><strong style={{ fontSize: 14, color: '#0a1e3f' }}>We keep the numbers low</strong>
+              </div>
+              <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.6, margin: 0 }}>
+                We use the lower end of reported results and ignore soft wins like happier staff. Real case studies often show 2 to 3 times what we show here.
+              </p>
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10, color: '#1e4fd6' }}>
+                <DollarSign size={18} /><strong style={{ fontSize: 14, color: '#0a1e3f' }}>Built to last</strong>
+              </div>
+              <p style={{ fontSize: 13.5, color: '#475569', lineHeight: 1.6, margin: 0 }}>
+                We only build systems we know will hold up under real-world use. That's what keeps them paying off long after we've handed them over.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Pricing — paid Strategic Discovery */}
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px 40px' }}>
+        <div style={{ background: 'white', borderRadius: 20, padding: 40, border: '2px solid #1e4fd6', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(30,79,214,0.06) 0%, transparent 70%)' }} />
+          <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'minmax(0, 1.4fr) minmax(0, 1fr)', gap: 40, alignItems: 'center' }}>
+            <div>
+              <div style={{ fontSize: 12, letterSpacing: 2, color: '#1e4fd6', fontWeight: 700, textTransform: 'uppercase', marginBottom: 6 }}>If you want to go further</div>
+              <h2 style={{ fontSize: 26, fontWeight: 700, margin: '0 0 14px', color: '#0a1e3f', letterSpacing: -0.4 }}>Strategic Discovery</h2>
+              <p style={{ fontSize: 15, color: '#475569', lineHeight: 1.6, margin: '0 0 14px' }}>
+                This brief is free. The next step is a paid Strategic Discovery: 2 to 4 weeks with you to build a full picture of your operation. You walk away with an operational analysis, a custom build roadmap, and exact numbers for your business.
+              </p>
+              <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6, margin: 0, fontStyle: 'italic' }}>
+                If you go ahead with the build, the Discovery fee is credited toward it. You only pay once.
+              </p>
+            </div>
+            <div style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%)', borderRadius: 14, padding: 28, border: '1px solid #e2e8f0' }}>
+              <div style={{ fontSize: 11, letterSpacing: 1.5, color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>Investment</div>
+              <div style={{ fontSize: 32, fontWeight: 700, color: '#0a1e3f', lineHeight: 1.1, marginBottom: 4 }}>AED 12,500 – 27,500</div>
+              <div style={{ fontSize: 14, color: '#64748b', marginBottom: 16 }}>$3,500 – $7,500</div>
+              <div style={{ paddingTop: 16, borderTop: '1px solid #e2e8f0', fontSize: 13, color: '#475569', lineHeight: 1.6 }}>
+                <div style={{ marginBottom: 6 }}><strong style={{ color: '#0a1e3f' }}>Duration:</strong> 2 to 4 weeks</div>
+                <div><strong style={{ color: '#0a1e3f' }}>Credit:</strong> 100% toward the build</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sources */}
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px 40px' }}>
+        <div style={{ background: '#f8fafc', borderRadius: 16, padding: 28, border: '1px solid #e2e8f0' }}>
+          <div style={{ fontSize: 11, letterSpacing: 2, color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: 14 }}>Sources</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, fontSize: 12.5, lineHeight: 1.55, color: '#475569' }}>
+            <div><strong style={{ color: '#0a1e3f' }}>Bayut Academy</strong>, Lead conversion benchmarks for Dubai real estate agents</div>
+            <div><strong style={{ color: '#0a1e3f' }}>Property Finder</strong>, UAE Real Estate Market Report 2025</div>
+            <div><strong style={{ color: '#0a1e3f' }}>Inman</strong>, 2025 Real Estate Technology Survey</div>
+            <div><strong style={{ color: '#0a1e3f' }}>NAR</strong>, 2025 Member Profile (transaction admin benchmarks)</div>
+            <div><strong style={{ color: '#0a1e3f' }}>Navigant Construction Forum</strong>, RFI Industry Study</div>
+            <div><strong style={{ color: '#0a1e3f' }}>CBRE UAE</strong>, Real Estate Market Review Q3–Q4 2025</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 40px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, fontSize: 12, color: '#94a3b8' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <img src={LOGO_BLUE} alt="Mindlink Systems" style={{ height: 28, width: 'auto', opacity: 0.7 }} />
+          <div>Mindlink Systems · For UAE Real Estate &amp; Property · 2026</div>
+        </div>
+        <div>These are industry averages. Your actual numbers may be higher or lower.</div>
+      </div>
+    </div>
+  );
+}
